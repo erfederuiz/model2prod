@@ -72,7 +72,7 @@ modelo = load_model(get_aws_creds())
 
 @app.route('/', methods=['GET'])
 def home():
-    return render_template('index.html')
+    return render_template('templates/index.html')
 
 
 @app.route('/predict/<int:periods>')
