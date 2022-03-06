@@ -68,11 +68,12 @@ def make_graph(predictions, periods):
 
     return to_html(fig, include_plotlyjs=False, include_mathjax=False, full_html=False)
 
+app.logger.info('App root path: ' + app.root_path)
 modelo = load_model(get_aws_creds())
 
 @app.route('/', methods=['GET'])
 def home():
-    return render_template('templates/index.html')
+    return render_template('index.html')
 
 
 @app.route('/predict/<int:periods>')
