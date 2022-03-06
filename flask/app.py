@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template, request
 import pickle
 import json
 import boto3
@@ -10,8 +10,8 @@ def load_model():
 # Creating the high level object oriented interface
     resource = boto3.resource(
         's3',
-        aws_access_key_id = 'AKIAQJD4VX47OGV4PW5V',
-        aws_secret_access_key = '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',
+        aws_access_key_id = '',
+        aws_secret_access_key = '',
         region_name = 'eu-west-3'
     )
 
@@ -31,6 +31,10 @@ modelo = load_model()
 @app.route('/')
 def hello_world():
 	return 'Endpoint Pickle loaded!\n\n'
+
+@app.route('/form')
+def form():
+    return render_template('form.html')
 
 @app.route('/predict')
 def predict():

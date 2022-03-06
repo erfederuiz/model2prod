@@ -1,6 +1,8 @@
 import boto3
 import pandas
 import pickle
+import json
+import numpy
 
 """
 https://supsystic.com/documentation/id-secret-access-key-amazon-s3/
@@ -16,16 +18,16 @@ https://github.com/Wintellect/DataScienceExamples/blob/master/Regression/SimpleL
 # Creating the low level functional client
 client = boto3.client(
     's3',
-    aws_access_key_id = 'AKIAQJD4VX47LN47IVP7',
-    aws_secret_access_key = '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',
+    aws_access_key_id = '',
+    aws_secret_access_key = '',
     region_name = 'eu-west-3'
 )
     
 # Creating the high level object oriented interface
 resource = boto3.resource(
     's3',
-    aws_access_key_id = 'AKIAQJD4VX47LN47IVP7',
-    aws_secret_access_key = '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',
+    aws_access_key_id = '',
+    aws_secret_access_key = '',
     region_name = 'eu-west-3'
 )
 
@@ -56,4 +58,9 @@ with open('local_model.pkl', 'wb') as data:
     resource.Bucket("dsftnov21-prod-test03").download_fileobj("finished_model_arima.model", data)  
 
 with open('local_model.pkl', 'rb') as data:
-    old_list = pickle.load(data)
+    modelo = pickle.load(data)
+
+predictions = modelo.predict(10)
+result = dict(enumerate(predictions.flatten(), 1))
+app_json = json.dumps(result)
+print(app_json)
