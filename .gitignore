@@ -1,0 +1,3 @@
+*.pkl
+*.model
+*/__pycache__/*
