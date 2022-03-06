@@ -5,13 +5,13 @@ import boto3
 
 app = Flask(__name__)
 
-def load_model():
+def load_model(creds):
     # Creating the low level functional client
 # Creating the high level object oriented interface
     resource = boto3.resource(
         's3',
-        aws_access_key_id = '',
-        aws_secret_access_key = '',
+        aws_access_key_id = creds["key"] ,
+        aws_secret_access_key = creds["secret"] ,
         region_name = 'eu-west-3'
     )
 
@@ -26,7 +26,16 @@ def load_model():
 
     return modelo_arima
 
-modelo = load_model()
+def get_aws_creds():
+    myvars = {}
+    with open("aws_creds.txt") as myfile:
+        for line in myfile:
+            name, var = line.partition("=")[::2]
+            myvars[name.strip()] = var.rstrip()
+
+    return myvars
+
+modelo = load_model(get_aws_creds())
 
 @app.route('/')
 def hello_world():
