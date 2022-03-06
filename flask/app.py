@@ -1,8 +1,12 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import pickle
 import json
 import boto3
 import logging
+import plotly.express as px
+from plotly.io import to_html
+from datetime import datetime, timedelta
+
 
 app = Flask(__name__)
 gunicorn_error_logger = logging.getLogger('gunicorn.error')
@@ -39,11 +43,36 @@ def get_aws_creds():
 
     return myvars
 
+def make_predictions2(modelo_arima, n_periods=2):
+    prediccion_model2 = list(modelo_arima.predict(n_periods=n_periods))
+    # print(prediccion_model2)
+    return prediccion_model2
+
+def get_dates(periods):
+    last_date = datetime.strptime('2019-12-31 20:00', '%Y-%m-%d %H:%M')
+    min_diff = 240  # 4 hours
+    dates = []
+
+    for i in range(1, periods + 1):
+        time_change = timedelta(minutes=min_diff * i)
+        new_date = last_date + time_change
+        dates.append(new_date.strftime('%Y-%m-%d %H:%M'))
+
+    return dates
+
+def make_graph(predictions, periods):
+    x = get_dates(periods)
+    y = predictions
+
+    fig = px.line(x=x, y=y, title='Particles evolution')
+
+    return to_html(fig, include_plotlyjs=False, include_mathjax=False, full_html=False)
+
 modelo = load_model(get_aws_creds())
 
-@app.route('/')
-def hello_world():
-	return 'Endpoint Pickle loaded!\n\n'
+@app.route('/', methods=['GET'])
+def home():
+    return render_template('index.html')
 
 
 @app.route('/predict/<int:periods>')
@@ -52,6 +81,18 @@ def predict(periods):
     result = dict(enumerate(predictions.flatten(), 1))
     app_json = json.dumps(result)
     return app_json
+
+@app.route('/api/model/unico/<int:periods>', methods=['GET'])
+def predict2(periods):
+    prediccion_model2 = make_predictions2(modelo, int(periods))
+
+    response = {
+        'prediction': prediccion_model2,
+        'graph': make_graph(prediccion_model2, periods)
+    }
+
+    return jsonify(response)
+
 
 if __name__ == "__main__":
     app.run()
