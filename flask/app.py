@@ -64,7 +64,12 @@ def make_graph(predictions, periods):
     x = get_dates(periods)
     y = predictions
 
-    fig = px.line(x=x, y=y, title='Particles evolution')
+    fig = px.line(
+        x=x,
+        y=y,
+        title='Concentración de particulas NO2 en atmósfera',
+        labels={'y' : 'Concentración NO2', 'x': 'Hora'}
+    )
 
     return to_html(fig, include_plotlyjs=False, include_mathjax=False, full_html=False)
 
